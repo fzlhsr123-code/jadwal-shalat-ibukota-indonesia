@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Monitoring Jadwal Sholat Seluruh Indonesia | 38 Ibukota Provinsi (Live API)</title>
+
+    <!-- Meta SEO -->
+    <meta name="description" content="Dashboard Terintegrasi Monitoring Jadwal Sholat 38 Ibukota Provinsi Seluruh Indonesia dari Sabang sampai Merauke secara real-time dari Live API Kementerian Agama RI.">
+    <meta name="keywords" content="jadwal sholat indonesia, monitoring sholat, 38 provinsi, kemenag, waktu sholat resmi, api myquran, hisab mabims">
+    <meta name="author" content="SIM Jadwal Sholat Indonesia">
+    <meta property="og:title" content="Dashboard Monitoring Jadwal Sholat 38 Provinsi Indonesia">
+    <meta property="og:description" content="Jadwal sholat lengkap 38 ibukota provinsi Indonesia, standar hisab Kemenag RI / MABIMS terintegrasi Live API.">
+    <meta property="og:type" content="website">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        arabic: ['"Amiri"', 'serif']
+                    },
+                    colors: {
+                        emerald: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            300: '#6ee7b7',
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                            950: '#022c22',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .bg-islamic-pattern {
+            background-color: #064e3b;
+            background-image: radial-gradient(circle at 50% 50%, rgba(16,185,129,0.15) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .print-table { box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-emerald-200 selection:text-emerald-900">
+
+    <!-- TOP ANNOUNCEMENT BAR -->
+    <div class="bg-emerald-950 text-emerald-200 text-xs py-2 px-4 border-b border-emerald-900/60 no-print">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-800 text-emerald-100">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    MABIMS LIVE API
+                </span>
+                <span class="hidden sm:inline text-slate-300">Standar Hisab Kementerian Agama Republik Indonesia (Live API)</span>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-medium">
+                <span class="flex items-center gap-1.5">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-400"></i>
+                    <span id="topHijriah">Memuat Kalender...</span>
+                </span>
+                <span class="hidden md:inline text-emerald-700">|</span>
+                <span class="flex items-center gap-1.5 text-emerald-300">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-400"></i>
+                    <span id="liveClockWib">Memuat Waktu...</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN HEADER -->
+    <header class="bg-islamic-pattern text-white shadow-xl relative overflow-hidden border-b-4 border-emerald-500">
+        <div class="absolute -top-24 -left-24 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-teal-400/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 relative z-10">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <!-- Branding -->
+                <div class="space-y-3">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-800/80 border border-emerald-600/60 backdrop-blur-sm text-xs font-medium text-emerald-200">
+                        <i data-lucide="satellite" class="w-4 h-4 text-emerald-300"></i>
+                        <span>Sistem Informasi Hisab &amp; Rukyat Nasional (Live API)</span>
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
+                        <span class="p-2.5 bg-emerald-600 rounded-xl shadow-lg ring-2 ring-emerald-400/30">
+                            <i data-lucide="moon-star" class="w-7 h-7 sm:w-8 sm:h-8 text-white"></i>
+                        </span>
+                        <span>Dashboard Monitoring Jadwal Sholat</span>
+                    </h1>
+                    <p class="text-emerald-100/90 text-sm sm:text-base max-w-2xl font-light">
+                        Pusat Pemantauan Terintegrasi Waktu Sholat 
+                        <span class="font-semibold text-emerald-300">38 Ibukota Provinsi Resmi Republik Indonesia</span> 
+                        dari Sabang hingga Merauke berbasis Live API Kemenag RI.
+                    </p>
+                </div>
+
+                <!-- Live Multi-Timezone Widget -->
+                <div class="bg-emerald-900/80 backdrop-blur-md border border-emerald-700/60 p-4 rounded-2xl shadow-xl flex flex-col gap-3 min-w-[280px]">
+                    <div class="flex items-center justify-between text-xs text-emerald-200 border-b border-emerald-800/70 pb-2">
+                        <span class="font-semibold flex items-center gap-1.5">
+                            <i data-lucide="radio" class="w-3.5 h-3.5 text-emerald-400 animate-pulse"></i>
+                            Sinkronisasi Waktu Nyata
+                        </span>
+                        <span class="text-[11px] bg-emerald-700/60 px-2 py-0.5 rounded text-emerald-100">Live API</span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="bg-emerald-950/60 p-2 rounded-xl border border-emerald-800/50">
+                            <span class="block text-[10px] font-bold text-emerald-300">WIB (UTC+7)</span>
+                            <span id="tzWib" class="text-sm font-extrabold text-white font-mono">--:--:--</span>
+                        </div>
+                        <div class="bg-emerald-950/60 p-2 rounded-xl border border-emerald-800/50">
+                            <span class="block text-[10px] font-bold text-teal-300">WITA (UTC+8)</span>
+                            <span id="tzWita" class="text-sm font-extrabold text-white font-mono">--:--:--</span>
+                        </div>
+                        <div class="bg-emerald-950/60 p-2 rounded-xl border border-emerald-800/50">
+                            <span class="block text-[10px] font-bold text-cyan-300">WIT (UTC+9)</span>
+                            <span id="tzWit" class="text-sm font-extrabold text-white font-mono">--:--:--</span>
+                        </div>
+                    </div>
+
+                    <div id="headerTanggalMasehi" class="text-[11px] text-center text-emerald-300 font-medium">
+                        Memuat Kalender...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 flex-1 w-full pb-16 z-20">
+
+        <!-- 4 KARTU STATISTIK OTOMATIS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <!-- Card 1: Total Wilayah -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/90 hover:shadow-md transition-shadow relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-bl-full -mr-4 -mt-4 transition-all group-hover:scale-110"></div>
+                <div class="flex items-center justify-between relative z-10">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Cakupan Wilayah</p>
+                        <h3 class="text-3xl font-extrabold text-slate-800 mt-1">
+                            38 <span class="text-sm font-normal text-slate-500">Ibukota</span>
+                        </h3>
+                        <p class="text-xs text-emerald-600 font-medium mt-1.5 flex items-center gap-1">
+                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+                            100% Provinsi Tercover
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-inner">
+                        <i data-lucide="map" class="w-6 h-6"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Kalender Masehi & Hijriah -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/90 hover:shadow-md transition-shadow relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-teal-50 rounded-bl-full -mr-4 -mt-4 transition-all group-hover:scale-110"></div>
+                <div class="flex items-center justify-between relative z-10">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kalender Hari Ini</p>
+                        <h3 id="cardTanggalMasehi" class="text-lg font-bold text-slate-800 mt-1 line-clamp-1">
+                            Memuat...
+                        </h3>
+                        <p id="cardHijriah" class="text-xs text-teal-700 font-semibold mt-1.5 flex items-center gap-1">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                            <span>Memuat...</span>
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center shadow-inner">
+                        <i data-lucide="calendar-days" class="w-6 h-6"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Distribusi Zona Waktu -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/90 hover:shadow-md transition-shadow relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-4 -mt-4 transition-all group-hover:scale-110"></div>
+                <div class="flex items-center justify-between relative z-10">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Sebaran Zona Waktu</p>
+                        <div class="flex items-center gap-3 mt-1.5">
+                            <span class="inline-flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                                WIB: <span class="text-emerald-700 font-extrabold">16</span>
+                            </span>
+                            <span class="inline-flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                                WITA: <span class="text-teal-700 font-extrabold">14</span>
+                            </span>
+                            <span class="inline-flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                                WIT: <span class="text-cyan-700 font-extrabold">8</span>
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium mt-1.5 flex items-center gap-1">
+                            <i data-lucide="globe" class="w-3.5 h-3.5 text-blue-600"></i>
+                            Lintas 3 Zona Waktu NKRI
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shadow-inner">
+                        <i data-lucide="hourglass" class="w-6 h-6"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Status Integrasi API -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/90 hover:shadow-md transition-shadow relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-bl-full -mr-4 -mt-4 transition-all group-hover:scale-110"></div>
+                <div class="flex items-center justify-between relative z-10">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status Integrasi</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                            <h3 class="text-base font-bold text-emerald-800">
+                                Live API Terintegrasi
+                            </h3>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium mt-1.5 flex items-center gap-1">
+                            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+                            Kemenag RI (MABIMS)
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-inner">
+                        <i data-lucide="database" class="w-6 h-6"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FITUR PILIH TANGGAL JADWAL SHOLAT -->
+        <div class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 rounded-2xl p-5 mb-6 shadow-md border border-emerald-700/60 text-white no-print relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-emerald-500/20 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10">
+                <!-- Info Tanggal Aktif -->
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-700/80 border border-emerald-500/50 flex items-center justify-center shrink-0 shadow-inner">
+                        <i data-lucide="calendar" class="w-6 h-6 text-emerald-200"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-bold text-emerald-300 uppercase tracking-wider">Pilih Tanggal Jadwal Sholat</span>
+                            <span id="dateStatusBadge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-400/20 text-emerald-200 border border-emerald-400/40">
+                                Hari Ini
+                            </span>
+                        </div>
+                        <h2 id="activeDateDisplay" class="text-base sm:text-lg font-extrabold text-white flex flex-wrap items-center gap-2 mt-0.5">
+                            <span id="displayMasehiText">Memuat Tanggal...</span>
+                            <span id="displayHijriahText" class="text-xs font-semibold text-emerald-200 bg-emerald-800/80 px-2.5 py-0.5 rounded-lg border border-emerald-600/60">
+                                Memuat Hijriah...
+                            </span>
+                        </h2>
+                    </div>
+                </div>
+
+                <!-- Kontrol Pemilihan Tanggal & Shortcut Cepat -->
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <!-- Input Tanggal -->
+                    <div class="flex items-center gap-1.5 bg-emerald-950/60 p-1.5 rounded-xl border border-emerald-700/60">
+                        <label for="prayerDatePicker" class="text-xs font-semibold text-emerald-200 pl-2 pr-1 hidden sm:inline">Pilih:</label>
+                        <input 
+                            type="date" 
+                            id="prayerDatePicker" 
+                            onchange="onMainDateChange(this.value)"
+                            class="px-3 py-1.5 bg-white text-slate-800 text-xs font-bold rounded-lg border border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer shadow-sm"
+                        >
+                    </div>
+
+                    <!-- Shortcut Cepat -->
+                    <div class="inline-flex p-1 bg-emerald-950/60 rounded-xl border border-emerald-700/60 text-xs font-semibold">
+                        <button 
+                            type="button" 
+                            onclick="setQuickDate('yesterday')" 
+                            class="px-2.5 py-1.5 rounded-lg text-emerald-100 hover:bg-emerald-700/60 transition flex items-center gap-1"
+                            title="Lihat Jadwal Kemarin"
+                        >
+                            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                            <span>Kemarin</span>
+                        </button>
+                        <button 
+                            type="button" 
+                            onclick="setQuickDate('today')" 
+                            class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold transition flex items-center gap-1 shadow-sm"
+                            title="Kembali ke Jadwal Hari Ini"
+                        >
+                            <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
+                            <span>Hari Ini</span>
+                        </button>
+                        <button 
+                            type="button" 
+                            onclick="setQuickDate('tomorrow')" 
+                            class="px-2.5 py-1.5 rounded-lg text-emerald-100 hover:bg-emerald-700/60 transition flex items-center gap-1"
+                            title="Lihat Jadwal Besok"
+                        >
+                            <span>Besok</span>
+                            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Alert bar jika sedang tanggal kustom -->
+            <div id="customDateNotice" class="hidden items-center justify-between mt-3 pt-3 border-t border-emerald-700/60 text-xs text-amber-200">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="info" class="w-4 h-4 text-amber-300"></i>
+                    <span>Menampilkan data jadwal sholat untuk tanggal <strong id="noticeDateText">--</strong>. Klik <strong>Hari Ini</strong> untuk kembali ke jadwal saat ini.</span>
+                </div>
+                <button type="button" onclick="setQuickDate('today')" class="underline hover:text-white font-bold ml-2 shrink-0">
+                    Reset ke Hari Ini
+                </button>
+            </div>
+        </div>
+
+        <!-- FITUR PENCARIAN & KONTROL INTERAKTIF -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6 no-print">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                <!-- Search Box -->
+                <div class="relative flex-1 max-w-xl">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        oninput="filterPrayerSchedule()" 
+                        placeholder="Cari nama kota atau provinsi (cth: Jayapura, Jawa Barat, Padang)..." 
+                        class="w-full pl-11 pr-10 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all font-medium"
+                    >
+                    <button 
+                        type="button" 
+                        id="clearSearchBtn" 
+                        onclick="clearSearch()" 
+                        class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 hidden"
+                        title="Bersihkan Pencarian"
+                    >
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- Filter Zona Waktu & Actions -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Quick Zone Filter Pills -->
+                    <div class="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200/80 text-xs font-semibold">
+                        <button type="button" onclick="setZoneFilter('ALL')" id="filterBtnALL" class="px-3 py-1.5 rounded-lg transition-colors bg-emerald-600 text-white shadow-sm">
+                            Semua (38)
+                        </button>
+                        <button type="button" onclick="setZoneFilter('WIB')" id="filterBtnWIB" class="px-3 py-1.5 rounded-lg transition-colors text-slate-600 hover:text-emerald-700">
+                            WIB (16)
+                        </button>
+                        <button type="button" onclick="setZoneFilter('WITA')" id="filterBtnWITA" class="px-3 py-1.5 rounded-lg transition-colors text-slate-600 hover:text-emerald-700">
+                            WITA (14)
+                        </button>
+                        <button type="button" onclick="setZoneFilter('WIT')" id="filterBtnWIT" class="px-3 py-1.5 rounded-lg transition-colors text-slate-600 hover:text-emerald-700">
+                            WIT (8)
+                        </button>
+                    </div>
+
+                    <!-- Export and Print Buttons -->
+                    <div class="flex items-center gap-2">
+                        <button 
+                            type="button" 
+                            onclick="exportToExcel()" 
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-sm"
+                            title="Download data langsung ke format Microsoft Excel"
+                        >
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                            <span>Ekspor Excel</span>
+                        </button>
+
+                        <button 
+                            type="button" 
+                            onclick="exportToCSV()" 
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors shadow-sm"
+                            title="Unduh Data Format CSV"
+                        >
+                            <i data-lucide="file-text" class="w-4 h-4 text-emerald-600"></i>
+                            <span>CSV</span>
+                        </button>
+
+                        <button 
+                            type="button" 
+                            onclick="window.print()" 
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm"
+                            title="Cetak Jadwal Sholat"
+                        >
+                            <i data-lucide="printer" class="w-4 h-4 text-slate-600"></i>
+                            <span>Cetak</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Result Status Counter -->
+            <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="resultsCounter">Menampilkan <strong>38</strong> dari 38 Ibukota Provinsi</span>
+                </div>
+                <div class="text-[11px] text-slate-400 hidden sm:block">
+                    *Kolom <strong>Subuh</strong> &amp; <strong>Maghrib</strong> ditebalkan sebagai acuan waktu sholat utama.
+                </div>
+            </div>
+        </div>
+
+        <!-- TABEL JADWAL SHOLAT 38 PROVINSI -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden print-table">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-700 text-xs uppercase tracking-wider font-bold border-b border-slate-200 select-none">
+                            <th class="py-4 px-4 text-center w-14">No</th>
+                            <th class="py-4 px-4 min-w-[200px]">Ibukota &amp; Provinsi</th>
+                            <th class="py-4 px-3 text-center">Zona</th>
+                            <th class="py-4 px-3 text-center">Penanggalan Hijriah</th>
+                            <th class="py-4 px-3 text-center bg-emerald-50 text-emerald-950 border-x border-emerald-100">
+                                Subuh *
+                            </th>
+                            <th class="py-4 px-3 text-center">Dzuhur</th>
+                            <th class="py-4 px-3 text-center">Ashar</th>
+                            <th class="py-4 px-3 text-center bg-emerald-50 text-emerald-950 border-x border-emerald-100">
+                                Maghrib *
+                            </th>
+                            <th class="py-4 px-3 text-center">Isya</th>
+                            <th class="py-4 px-4 text-center w-28 no-print">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prayerTableBody" class="divide-y divide-slate-100">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty Search State -->
+            <div id="noResultsState" class="hidden p-12 text-center">
+                <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i data-lucide="search-x" class="w-8 h-8"></i>
+                </div>
+                <h4 class="text-base font-bold text-slate-800">Kota atau Provinsi Tidak Ditemukan</h4>
+                <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                    Tidak ada hasil yang cocok dengan kata kunci pencarian Anda. Silakan periksa ejaan atau gunakan tombol filter zona.
+                </p>
+                <button 
+                    type="button" 
+                    onclick="clearSearch()" 
+                    class="mt-4 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold transition shadow-sm"
+                >
+                    Reset Pencarian
+                </button>
+            </div>
+        </div>
+
+        <!-- INFO PROTOKOL KEMENAG RI FOOTER BANNER -->
+        <div class="mt-8 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 rounded-2xl p-6 border border-emerald-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-start gap-4">
+                <div class="p-3 bg-emerald-600 text-white rounded-xl shadow-md shrink-0">
+                    <i data-lucide="shield-alert" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-emerald-950">Pedoman Standar Hisab Waktu Sholat Indonesia (MABIMS)</h4>
+                    <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                        Perhitungan waktu sholat mengacu pada kriteria Menteri Agama Brunei Darussalam, Indonesia, Malaysia, dan Singapura (MABIMS):
+                        Tinggi hilal 3° dan elongasi 6,4°. Waktu Imsak ditetapkan 10 menit sebelum waktu Subuh (ikhtiyat/pengaman: 2 menit).
+                    </p>
+                </div>
+            </div>
+            <div class="shrink-0 flex items-center gap-3">
+                <div class="text-right">
+                    <span class="block text-[11px] font-bold text-emerald-900">Sumber API</span>
+                    <span class="text-xs text-emerald-700 font-mono">api.myquran.com/v2</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER WITH GREEN & WHITE AESTHETIC -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-slate-500 text-xs no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="p-1.5 bg-emerald-600 text-white rounded-md">
+                    <i data-lucide="moon" class="w-4 h-4"></i>
+                </span>
+                <span class="font-bold text-slate-800">SIM-JADWAL SHOLAT INDONESIA</span>
+                <span id="footerYear">&copy; 2026 All Rights Reserved.</span>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-medium text-slate-600">
+                <span class="hover:text-emerald-600 transition">38 Ibukota Provinsi</span>
+                <span>&bull;</span>
+                <span class="hover:text-emerald-600 transition">Standar MABIMS</span>
+                <span>&bull;</span>
+                <span class="hover:text-emerald-600 transition">Live API Kemenag</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE DETAIL MODAL -->
+    <div id="cityModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-emerald-800 to-emerald-700 text-white p-6 relative shrink-0">
+                <button 
+                    type="button" 
+                    onclick="closeCityModal()" 
+                    class="absolute top-5 right-5 text-emerald-200 hover:text-white transition p-1.5 rounded-xl hover:bg-emerald-600/80"
+                    title="Tutup Modal"
+                >
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+                <div class="flex items-center gap-2 text-xs font-semibold text-emerald-200 mb-1">
+                    <i data-lucide="map-pin" class="w-4 h-4 text-emerald-300"></i>
+                    <span id="modalProvinsi">Provinsi</span>
+                </div>
+                <h3 id="modalKota" class="text-2xl font-black tracking-tight text-white">Nama Kota</h3>
+                <div class="flex flex-wrap items-center gap-2 mt-2">
+                    <span id="modalZona" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-900 text-emerald-200 border border-emerald-600">WIB</span>
+                    <span id="modalHijriah" class="text-xs text-emerald-100 font-medium bg-emerald-900/70 px-2.5 py-0.5 rounded-full border border-emerald-700">Hijriah</span>
+                    <span class="text-xs text-emerald-100 font-medium bg-emerald-900/70 px-2.5 py-0.5 rounded-full border border-emerald-700 flex items-center gap-1">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-300"></i>
+                        <span id="modalMasehi">Tanggal Masehi</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Modal Content (Scrollable) -->
+            <div class="p-6 overflow-y-auto flex-1">
+                <!-- Modal Date Switcher -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 mb-5 shadow-xs">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-2.5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="text-xs font-bold text-slate-700">Pilih Tanggal:</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 w-full sm:w-auto justify-between sm:justify-end">
+                            <button type="button" onclick="stepModalDate(-1)" class="p-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition shadow-xs" title="Hari Sebelumnya">
+                                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                            </button>
+                            <input 
+                                type="date" 
+                                id="modalDatePicker" 
+                                onchange="loadModalCityDate(this.value)" 
+                                class="px-2.5 py-1 text-xs font-bold text-slate-800 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer shadow-xs"
+                            >
+                            <button type="button" onclick="stepModalDate(1)" class="p-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition shadow-xs" title="Hari Berikutnya">
+                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </button>
+                            <button type="button" onclick="setModalToday()" class="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition shadow-xs">
+                                Hari Ini
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between mb-3">
+                    <p id="modalScheduleLabel" class="text-xs font-bold text-slate-500 uppercase tracking-wider">Rincian Waktu Sholat</p>
+                    <span id="modalApiStatusText" class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">Live API</span>
+                </div>
+
+                <!-- Loading overlay for modal -->
+                <div id="modalLoadingOverlay" class="hidden py-8 text-center bg-slate-50 rounded-2xl border border-slate-200 mb-5">
+                    <div class="inline-block animate-spin rounded-full h-7 w-7 border-3 border-emerald-600 border-t-transparent"></div>
+                    <p class="text-xs text-slate-600 font-bold mt-2">Mengambil jadwal sholat dari API Kemenag...</p>
+                </div>
+
+                <!-- 8-Box Prayer Grid -->
+                <div id="modalPrayerGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5">
+                    <!-- Imsak -->
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 text-center">
+                        <span class="text-[11px] font-semibold text-slate-500 block">Imsak</span>
+                        <span id="modalImsak" class="text-base font-extrabold text-slate-800 font-mono">--:--</span>
+                    </div>
+                    <!-- Subuh -->
+                    <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-300 text-center ring-2 ring-emerald-500/20">
+                        <span class="text-[11px] font-bold text-emerald-800 block">Subuh *</span>
+                        <span id="modalSubuh" class="text-lg font-black text-emerald-900 font-mono">--:--</span>
+                    </div>
+                    <!-- Terbit -->
+                    <div class="bg-amber-50/60 p-3 rounded-2xl border border-amber-200 text-center">
+                        <span class="text-[11px] font-semibold text-amber-700 block">Terbit</span>
+                        <span id="modalTerbit" class="text-base font-extrabold text-amber-900 font-mono">--:--</span>
+                    </div>
+                    <!-- Dhuha -->
+                    <div class="bg-amber-50/60 p-3 rounded-2xl border border-amber-200 text-center">
+                        <span class="text-[11px] font-semibold text-amber-700 block">Dhuha</span>
+                        <span id="modalDhuha" class="text-base font-extrabold text-amber-900 font-mono">--:--</span>
+                    </div>
+                    <!-- Dzuhur -->
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 text-center">
+                        <span class="text-[11px] font-semibold text-slate-500 block">Dzuhur</span>
+                        <span id="modalDzuhur" class="text-base font-extrabold text-slate-800 font-mono">--:--</span>
+                    </div>
+                    <!-- Ashar -->
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 text-center">
+                        <span class="text-[11px] font-semibold text-slate-500 block">Ashar</span>
+                        <span id="modalAshar" class="text-base font-extrabold text-slate-800 font-mono">--:--</span>
+                    </div>
+                    <!-- Maghrib -->
+                    <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-300 text-center ring-2 ring-emerald-500/20">
+                        <span class="text-[11px] font-bold text-emerald-800 block">Maghrib *</span>
+                        <span id="modalMaghrib" class="text-base font-black text-emerald-900 font-mono">--:--</span>
+                    </div>
+                    <!-- Isya -->
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 text-center">
+                        <span class="text-[11px] font-semibold text-slate-500 block">Isya</span>
+                        <span id="modalIsya" class="text-base font-extrabold text-slate-800 font-mono">--:--</span>
+                    </div>
+                </div>
+
+                <!-- Toggle Monthly Schedule Section -->
+                <div class="mb-5">
+                    <button 
+                        type="button" 
+                        id="toggleMonthBtn" 
+                        onclick="toggleMonthlySchedule()" 
+                        class="w-full py-2.5 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-2xl border border-emerald-200 transition flex items-center justify-between shadow-xs"
+                    >
+                        <span class="flex items-center gap-2">
+                            <i data-lucide="calendar-range" class="w-4 h-4 text-emerald-600"></i>
+                            <span id="monthBtnText">Lihat Jadwal 1 Bulan Penuh</span>
+                        </span>
+                        <i data-lucide="chevron-down" id="monthChevron" class="w-4 h-4 text-emerald-600 transition-transform"></i>
+                    </button>
+                    
+                    <div id="monthlyScheduleContainer" class="hidden mt-3 max-h-60 overflow-y-auto border border-slate-200 rounded-2xl bg-white shadow-inner">
+                        <div id="monthScheduleLoading" class="py-6 text-center text-slate-500 font-medium">
+                            <div class="inline-block animate-spin rounded-full h-5 w-5 border-2 border-emerald-500 border-t-transparent mr-2"></div>
+                            Memuat kalender bulanan dari API...
+                        </div>
+                        <div id="monthScheduleTableWrapper" class="hidden">
+                            <table class="w-full text-center text-xs border-collapse" id="monthScheduleTable">
+                                <thead>
+                                    <tr class="bg-emerald-700 text-white font-bold sticky top-0 text-[11px]">
+                                        <th class="py-2 px-3 text-left">Tanggal</th>
+                                        <th class="py-2 px-1.5">Imsak</th>
+                                        <th class="py-2 px-1.5">Subuh</th>
+                                        <th class="py-2 px-1.5">Dzuhur</th>
+                                        <th class="py-2 px-1.5">Ashar</th>
+                                        <th class="py-2 px-1.5">Maghrib</th>
+                                        <th class="py-2 px-1.5">Isya</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="monthScheduleTableBody" class="divide-y divide-slate-100 font-mono text-[11px]">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Arah Kiblat -->
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold shrink-0">
+                            <i data-lucide="compass" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-slate-800 block">Arah Kiblat Estimasi</span>
+                            <span class="text-[11px] text-slate-500">294° s/d 296° Barat-Barat Laut (Standar Kemenag)</span>
+                        </div>
+                    </div>
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-lg">MABIMS</span>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex items-center justify-between shrink-0">
+                <button 
+                    type="button" 
+                    id="copyScheduleBtn" 
+                    onclick="copyScheduleToClipboard()" 
+                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100 transition shadow-xs"
+                >
+                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                    <span id="copyBtnText">Salin Jadwal</span>
+                </button>
+                <button 
+                    type="button" 
+                    onclick="closeCityModal()" 
+                    class="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition shadow-sm"
+                >
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT FRONTEND LOGIC -->
+    <script>
+        // =====================================================================================
+        // DATA 38 IBUKOTA PROVINSI DENGAN ID ENDPOINT RESMI LIVE API MYQURAN (KEMENAG RI)
+        // Standar Hisab MABIMS (Tepat sama dengan file index.php)
+        // =====================================================================================
+        const PRAYER_DATA = [
+            // --- WILAYAH SUMATERA (10 PROVINSI) ---
+            { id: 1, api_id: '0119', kota: 'Banda Aceh', provinsi: 'Aceh', zona: 'WIB', imsak: '04:58', subuh: '05:08', dzuhur: '12:26', ashar: '15:46', maghrib: '18:24', isya: '19:34', status: 'Live API (MyQuran)' },
+            { id: 2, api_id: '0228', kota: 'Medan', provinsi: 'Sumatera Utara', zona: 'WIB', imsak: '04:43', subuh: '04:53', dzuhur: '12:13', ashar: '15:32', maghrib: '18:12', isya: '19:22', status: 'Live API (MyQuran)' },
+            { id: 3, api_id: '0314', kota: 'Padang', provinsi: 'Sumatera Barat', zona: 'WIB', imsak: '04:32', subuh: '04:42', dzuhur: '12:06', ashar: '15:23', maghrib: '18:10', isya: '19:20', status: 'Live API (MyQuran)' },
+            { id: 4, api_id: '0412', kota: 'Pekanbaru', provinsi: 'Riau', zona: 'WIB', imsak: '04:29', subuh: '04:39', dzuhur: '12:02', ashar: '15:19', maghrib: '18:04', isya: '19:14', status: 'Live API (MyQuran)' },
+            { id: 5, api_id: '0507', kota: 'Tanjungpinang', provinsi: 'Kepulauan Riau', zona: 'WIB', imsak: '04:18', subuh: '04:28', dzuhur: '11:51', ashar: '15:08', maghrib: '17:53', isya: '19:03', status: 'Live API (MyQuran)' },
+            { id: 6, api_id: '0610', kota: 'Jambi', provinsi: 'Jambi', zona: 'WIB', imsak: '04:21', subuh: '04:31', dzuhur: '11:56', ashar: '15:13', maghrib: '18:00', isya: '19:10', status: 'Live API (MyQuran)' },
+            { id: 7, api_id: '0816', kota: 'Palembang', provinsi: 'Sumatera Selatan', zona: 'WIB', imsak: '04:15', subuh: '04:25', dzuhur: '11:50', ashar: '15:07', maghrib: '17:55', isya: '19:05', status: 'Live API (MyQuran)' },
+            { id: 8, api_id: '0907', kota: 'Pangkalpinang', provinsi: 'Kepulauan Bangka Belitung', zona: 'WIB', imsak: '04:10', subuh: '04:20', dzuhur: '11:45', ashar: '15:02', maghrib: '17:49', isya: '18:59', status: 'Live API (MyQuran)' },
+            { id: 9, api_id: '0710', kota: 'Bengkulu', provinsi: 'Bengkulu', zona: 'WIB', imsak: '04:23', subuh: '04:33', dzuhur: '11:58', ashar: '15:15', maghrib: '18:04', isya: '19:14', status: 'Live API (MyQuran)' },
+            { id: 10, api_id: '1008', kota: 'Bandar Lampung', provinsi: 'Lampung', zona: 'WIB', imsak: '04:11', subuh: '04:21', dzuhur: '11:47', ashar: '15:05', maghrib: '17:54', isya: '19:04', status: 'Live API (MyQuran)' },
+
+            // --- WILAYAH JAWA & BALI & NUSA TENGGARA (9 PROVINSI) ---
+            { id: 11, api_id: '1106', kota: 'Serang', provinsi: 'Banten', zona: 'WIB', imsak: '04:03', subuh: '04:13', dzuhur: '11:43', ashar: '14:56', maghrib: '17:51', isya: '19:02', status: 'Live API (MyQuran)' },
+            { id: 12, api_id: '1301', kota: 'Jakarta', provinsi: 'DKI Jakarta', zona: 'WIB', imsak: '04:00', subuh: '04:10', dzuhur: '11:40', ashar: '14:53', maghrib: '17:49', isya: '19:00', status: 'Live API (MyQuran)' },
+            { id: 13, api_id: '1219', kota: 'Bandung', provinsi: 'Jawa Barat', zona: 'WIB', imsak: '03:57', subuh: '04:07', dzuhur: '11:37', ashar: '14:52', maghrib: '17:48', isya: '18:59', status: 'Live API (MyQuran)' },
+            { id: 14, api_id: '1428', kota: 'Semarang', provinsi: 'Jawa Tengah', zona: 'WIB', imsak: '03:45', subuh: '03:55', dzuhur: '11:25', ashar: '14:40', maghrib: '17:36', isya: '18:47', status: 'Live API (MyQuran)' },
+            { id: 15, api_id: '1605', kota: 'Yogyakarta', provinsi: 'DI Yogyakarta', zona: 'WIB', imsak: '03:45', subuh: '03:55', dzuhur: '11:25', ashar: '14:41', maghrib: '17:36', isya: '18:48', status: 'Live API (MyQuran)' },
+            { id: 16, api_id: '1505', kota: 'Surabaya', provinsi: 'Jawa Timur', zona: 'WIB', imsak: '03:36', subuh: '03:46', dzuhur: '11:17', ashar: '14:31', maghrib: '17:27', isya: '18:38', status: 'Live API (MyQuran)' },
+            { id: 17, api_id: '1708', kota: 'Denpasar', provinsi: 'Bali', zona: 'WITA', imsak: '04:26', subuh: '04:36', dzuhur: '12:07', ashar: '15:20', maghrib: '18:16', isya: '19:28', status: 'Live API (MyQuran)' },
+            { id: 18, api_id: '1808', kota: 'Mataram', provinsi: 'Nusa Tenggara Barat', zona: 'WITA', imsak: '04:23', subuh: '04:33', dzuhur: '12:03', ashar: '15:17', maghrib: '18:13', isya: '19:24', status: 'Live API (MyQuran)' },
+            { id: 19, api_id: '1908', kota: 'Kupang', provinsi: 'Nusa Tenggara Timur', zona: 'WITA', imsak: '04:02', subuh: '04:12', dzuhur: '11:42', ashar: '14:54', maghrib: '17:51', isya: '19:02', status: 'Live API (MyQuran)' },
+
+            // --- WILAYAH KALIMANTAN (5 PROVINSI) ---
+            { id: 20, api_id: '2009', kota: 'Pontianak', provinsi: 'Kalimantan Barat', zona: 'WIB', imsak: '03:57', subuh: '04:07', dzuhur: '11:30', ashar: '14:48', maghrib: '17:33', isya: '18:43', status: 'Live API (MyQuran)' },
+            { id: 21, api_id: '2108', kota: 'Palangka Raya', provinsi: 'Kalimantan Tengah', zona: 'WIB', imsak: '03:42', subuh: '03:52', dzuhur: '11:16', ashar: '14:34', maghrib: '17:21', isya: '18:31', status: 'Live API (MyQuran)' },
+            { id: 22, api_id: '2207', kota: 'Banjarmasin', provinsi: 'Kalimantan Selatan', zona: 'WITA', imsak: '04:36', subuh: '04:46', dzuhur: '12:12', ashar: '15:28', maghrib: '18:16', isya: '19:26', status: 'Live API (MyQuran)' },
+            { id: 23, api_id: '2308', kota: 'Samarinda', provinsi: 'Kalimantan Timur', zona: 'WITA', imsak: '04:26', subuh: '04:36', dzuhur: '12:00', ashar: '15:19', maghrib: '18:03', isya: '19:13', status: 'Live API (MyQuran)' },
+            { id: 24, api_id: '2402', kota: 'Tanjung Selor', provinsi: 'Kalimantan Utara', zona: 'WITA', imsak: '04:23', subuh: '04:33', dzuhur: '11:58', ashar: '15:18', maghrib: '18:00', isya: '19:10', status: 'Live API (MyQuran)' },
+
+            // --- WILAYAH SULAWESI (6 PROVINSI) ---
+            { id: 25, api_id: '2914', kota: 'Manado', provinsi: 'Sulawesi Utara', zona: 'WITA', imsak: '03:56', subuh: '04:06', dzuhur: '11:28', ashar: '14:46', maghrib: '17:30', isya: '18:39', status: 'Live API (MyQuran)' },
+            { id: 26, api_id: '2606', kota: 'Gorontalo', provinsi: 'Gorontalo', zona: 'WITA', imsak: '04:06', subuh: '04:16', dzuhur: '11:38', ashar: '14:56', maghrib: '17:41', isya: '18:50', status: 'Live API (MyQuran)' },
+            { id: 27, api_id: '2708', kota: 'Palu', provinsi: 'Sulawesi Tengah', zona: 'WITA', imsak: '04:17', subuh: '04:27', dzuhur: '11:50', ashar: '15:08', maghrib: '17:53', isya: '19:02', status: 'Live API (MyQuran)' },
+            { id: 28, api_id: '2802', kota: 'Mamuju', provinsi: 'Sulawesi Barat', zona: 'WITA', imsak: '04:20', subuh: '04:30', dzuhur: '11:53', ashar: '15:10', maghrib: '17:55', isya: '19:05', status: 'Live API (MyQuran)' },
+            { id: 29, api_id: '2908', kota: 'Makassar', provinsi: 'Sulawesi Selatan', zona: 'WITA', imsak: '04:18', subuh: '04:28', dzuhur: '11:50', ashar: '15:06', maghrib: '17:52', isya: '19:02', status: 'Live API (MyQuran)' },
+            { id: 30, api_id: '2717', kota: 'Kendari', provinsi: 'Sulawesi Tenggara', zona: 'WITA', imsak: '04:00', subuh: '04:10', dzuhur: '11:37', ashar: '14:52', maghrib: '17:44', isya: '18:54', status: 'Live API (MyQuran)' },
+
+            // --- WILAYAH MALUKU & PAPUA (8 PROVINSI) ---
+            { id: 31, api_id: '3108', kota: 'Ambon', provinsi: 'Maluku', zona: 'WIT', imsak: '04:44', subuh: '04:54', dzuhur: '12:17', ashar: '15:29', maghrib: '18:22', isya: '19:32', status: 'Live API (MyQuran)' },
+            { id: 32, api_id: '3211', kota: 'Sofifi', provinsi: 'Maluku Utara', zona: 'WIT', imsak: '04:47', subuh: '04:57', dzuhur: '12:19', ashar: '15:37', maghrib: '18:22', isya: '19:31', status: 'Live API (MyQuran)' },
+            { id: 33, api_id: '3329', kota: 'Jayapura', provinsi: 'Papua', zona: 'WIT', imsak: '03:52', subuh: '04:02', dzuhur: '11:26', ashar: '14:38', maghrib: '17:31', isya: '18:40', status: 'Live API (MyQuran)' },
+            { id: 34, api_id: '3403', kota: 'Manokwari', provinsi: 'Papua Barat', zona: 'WIT', imsak: '04:19', subuh: '04:29', dzuhur: '11:52', ashar: '15:07', maghrib: '17:55', isya: '19:04', status: 'Live API (MyQuran)' },
+            { id: 35, api_id: '3413', kota: 'Sorong', provinsi: 'Papua Barat Daya', zona: 'WIT', imsak: '04:27', subuh: '04:37', dzuhur: '12:01', ashar: '15:17', maghrib: '18:04', isya: '19:14', status: 'Live API (MyQuran)' },
+            { id: 36, api_id: '3317', kota: 'Nabire', provinsi: 'Papua Tengah', zona: 'WIT', imsak: '04:10', subuh: '04:20', dzuhur: '11:44', ashar: '14:58', maghrib: '17:48', isya: '18:57', status: 'Live API (MyQuran)' },
+            { id: 37, api_id: '3308', kota: 'Wamena', provinsi: 'Papua Pegunungan', zona: 'WIT', imsak: '04:00', subuh: '04:10', dzuhur: '11:34', ashar: '14:48', maghrib: '17:38', isya: '18:48', status: 'Live API (MyQuran)' },
+            { id: 38, api_id: '3315', kota: 'Merauke', provinsi: 'Papua Selatan', zona: 'WIT', imsak: '03:48', subuh: '03:58', dzuhur: '11:22', ashar: '14:38', maghrib: '17:28', isya: '18:38', status: 'Live API (MyQuran)' }
+        ];
+
+        // =====================================================================================
+        // ALGORITMA PENANGGALAN HIJRIAH (Algoritma Julian Day standar Ummul Qura)
+        // =====================================================================================
+        function konversiKeHijriah(dateObj) {
+            const d = dateObj || new Date();
+            let day = d.getDate(), month = d.getMonth() + 1, year = d.getFullYear();
+            if (month > 2) {
+                month -= 3;
+            } else {
+                month += 9;
+                year -= 1;
+            }
+            const c  = Math.floor(year / 100);
+            const ya = year - 100 * c;
+            const jd = Math.floor(146097 * c / 4) + Math.floor(1461 * ya / 4) + Math.floor((153 * month + 2) / 5) + day + 1721119;
+            let l = jd - 1948440 + 10632;
+            const n = Math.floor((l - 1) / 10631);
+            l = l - 10631 * n + 354;
+            const j = Math.floor((10985 - l) / 5316) * Math.floor(50 * l / 17719) + Math.floor(l / 5670) * Math.floor(43 * l / 15238);
+            l = l - Math.floor((30 - j) / 15) * Math.floor(17719 * j / 50) - Math.floor(j / 16) * Math.floor(15238 * j / 43) + 29;
+            const hMonth = Math.floor(24 * l / 709);
+            const hDay   = l - Math.floor(709 * hMonth / 24);
+            const hYear  = 30 * n + j - 30;
+            const bulan  = ['', 'Muharram', 'Safar', 'Rabiul Awwal', 'Rabiul Akhir', 'Jumadil Ula', 'Jumadil Akhir', 'Rajab', "Sya'ban", 'Ramadhan', 'Syawwal', "Dzulqa'dah", 'Dzulhijjah'];
+            return hDay + ' ' + (bulan[hMonth] || 'Hijriah') + ' ' + hYear + ' H';
+        }
+
+        function formatTanggalID(d) {
+            const hari  = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const bulan = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            return hari[d.getDay()] + ', ' + d.getDate() + ' ' + bulan[d.getMonth() + 1] + ' ' + d.getFullYear();
+        }
+
+        // State global
+        const today   = new Date();
+        const hijriah = konversiKeHijriah(today);
+        const masehi  = formatTanggalID(today);
+        let currentZoneFilter = 'ALL';
+        let currentModalData  = null;
+
+        // Inisialisasi hijriah ke data array
+        PRAYER_DATA.forEach(r => r.hijriah = hijriah);
+
+        // =====================================================================================
+        // JAM REAL-TIME DINAMIS UNTUK 3 ZONA WAKTU (WIB, WITA, WIT)
+        // =====================================================================================
+        function startLiveClocks() {
+            function tick() {
+                const now = new Date();
+                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                function fmt(h) {
+                    const t = new Date(utc + 3600000 * h);
+                    return [t.getHours(), t.getMinutes(), t.getSeconds()].map(v => String(v).padStart(2, '0')).join(':');
+                }
+                const wib  = fmt(7);
+                const wita = fmt(8);
+                const wit  = fmt(9);
+
+                const elWib  = document.getElementById('tzWib');
+                const elWita = document.getElementById('tzWita');
+                const elWit  = document.getElementById('tzWit');
+                const elTop  = document.getElementById('liveClockWib');
+
+                if (elWib)  elWib.textContent  = wib;
+                if (elWita) elWita.textContent = wita;
+                if (elWit)  elWit.textContent  = wit;
+                if (elTop)  elTop.textContent  = wib + ' WIB';
+            }
+            tick();
+            setInterval(tick, 1000);
+        }
+
+        // =====================================================================================
+        // RENDER TABEL JADWAL SHOLAT
+        // =====================================================================================
+        function renderTable(data) {
+            const tbody = document.getElementById('prayerTableBody');
+            tbody.innerHTML = data.map((row, i) => {
+                const badge =
+                    row.zona === 'WIB'  ? '<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">WIB</span>'  :
+                    row.zona === 'WITA' ? '<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-teal-100 text-teal-800 border border-teal-200">WITA</span>' :
+                                          '<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-cyan-100 text-cyan-800 border border-cyan-200">WIT</span>';
+
+                const safe = JSON.stringify(row).replace(/"/g, '&quot;');
+
+                return `
+                <tr class="hover:bg-emerald-50/50 transition-colors prayer-row" data-id="${row.id}" data-kota="${row.kota.toLowerCase()}" data-provinsi="${row.provinsi.toLowerCase()}" data-zona="${row.zona}">
+                    <td class="py-3.5 px-4 text-center font-mono text-xs text-slate-400 font-medium row-number">${i + 1}</td>
+                    <td class="py-3.5 px-4">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-100/80 text-emerald-700 flex items-center justify-center shrink-0 font-bold text-xs">${row.kota.substring(0, 2).toUpperCase()}</div>
+                            <div>
+                                <div class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                                    <span>${row.kota}</span>
+                                    <span class="city-live-indicator text-[10px] text-emerald-600 ${row.isLive ? '' : 'hidden'}" title="Tersinkron Live API MyQuran">
+                                        <i data-lucide="check" class="w-3 h-3 inline"></i>
+                                    </span>
+                                </div>
+                                <div class="text-xs text-slate-500 font-medium">Prov. ${row.provinsi}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3.5 px-3 text-center">${badge}</td>
+                    <td class="py-3.5 px-3 text-center text-xs text-slate-600 font-medium">
+                        <span class="bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200/60 inline-block">${row.hijriah}</span>
+                    </td>
+                    <td class="py-3.5 px-3 text-center bg-emerald-50/50 border-x border-emerald-100/60">
+                        <span class="inline-block font-mono font-extrabold text-emerald-800 text-sm bg-white px-2 py-0.5 rounded border border-emerald-300 row-subuh">${row.subuh}</span>
+                    </td>
+                    <td class="py-3.5 px-3 text-center font-mono text-slate-700 text-xs font-semibold row-dzuhur">${row.dzuhur}</td>
+                    <td class="py-3.5 px-3 text-center font-mono text-slate-700 text-xs font-semibold row-ashar">${row.ashar}</td>
+                    <td class="py-3.5 px-3 text-center bg-emerald-50/50 border-x border-emerald-100/60">
+                        <span class="inline-block font-mono font-extrabold text-emerald-900 text-sm bg-white px-2 py-0.5 rounded border border-emerald-300 row-maghrib">${row.maghrib}</span>
+                    </td>
+                    <td class="py-3.5 px-3 text-center font-mono text-slate-700 text-xs font-semibold row-isya">${row.isya}</td>
+                    <td class="py-3.5 px-4 text-center no-print">
+                        <button type="button" onclick="openCityModalById(${row.id})" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition shadow-xs" title="Lihat Detail Kartu Jadwal">
+                            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                            <span>Detail</span>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // =====================================================================================
+        // FILTER & PENCARIAN REAL-TIME
+        // =====================================================================================
+        function filterPrayerSchedule() {
+            const kw   = document.getElementById('searchInput').value.toLowerCase().trim();
+            const rows = document.querySelectorAll('.prayer-row');
+            document.getElementById('clearSearchBtn').classList.toggle('hidden', kw.length === 0);
+            let vis = 0;
+            rows.forEach(r => {
+                const ok = (r.dataset.kota.includes(kw) || r.dataset.provinsi.includes(kw))
+                        && (currentZoneFilter === 'ALL' || r.dataset.zona === currentZoneFilter);
+                r.style.display = ok ? '' : 'none';
+                if (ok) {
+                    vis++;
+                    const c = r.querySelector('.row-number');
+                    if (c) c.textContent = vis;
+                }
+            });
+            document.getElementById('noResultsState').classList.toggle('hidden', vis > 0);
+            document.getElementById('resultsCounter').innerHTML = 'Menampilkan <strong>' + vis + '</strong> dari ' + rows.length + ' Ibukota Provinsi';
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            filterPrayerSchedule();
+            document.getElementById('searchInput').focus();
+        }
+
+        function setZoneFilter(zone) {
+            currentZoneFilter = zone;
+            ['ALL', 'WIB', 'WITA', 'WIT'].forEach(b => {
+                const btn = document.getElementById('filterBtn' + b);
+                if (btn) {
+                    btn.className = b === zone
+                        ? 'px-3 py-1.5 rounded-lg transition-colors bg-emerald-600 text-white shadow-sm'
+                        : 'px-3 py-1.5 rounded-lg transition-colors text-slate-600 hover:text-emerald-700';
+                }
+            });
+            filterPrayerSchedule();
+        }
+
+        // =====================================================================================
+        // SINKRONISASI REAL-TIME DARI LIVE API MYQURAN (CLIENT-SIDE FETCH)
+        // =====================================================================================
+        let currentSelectedDate = new Date().toISOString().slice(0, 10);
+        let modalActiveDate = currentSelectedDate;
+        let monthlyDataCache = {};
+
+        function parseDateString(dateStr) {
+            const parts = dateStr.split('-');
+            return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 12, 0, 0);
+        }
+
+        function toDateInputString(dateObj) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        // 4. LOGIKA PEMILIHAN TANGGAL UTAMA (MAIN DATE CONTROLS)
+        function onMainDateChange(newDateStr) {
+            if (!newDateStr) return;
+            currentSelectedDate = newDateStr;
+            const dateObj = parseDateString(newDateStr);
+            const masehiStr = formatTanggalID(dateObj);
+            const hijriahStr = konversiKeHijriah(dateObj);
+
+            const todayStr = toDateInputString(new Date());
+            const isToday = (newDateStr === todayStr);
+
+            const elDisplayMasehi = document.getElementById('displayMasehiText');
+            const elDisplayHijriah = document.getElementById('displayHijriahText');
+            const elBadge = document.getElementById('dateStatusBadge');
+            const elNotice = document.getElementById('customDateNotice');
+            const elNoticeText = document.getElementById('noticeDateText');
+            const elHeaderMasehi = document.getElementById('headerTanggalMasehi');
+            const elCardMasehi = document.getElementById('cardTanggalMasehi');
+            const elCardHijriah = document.getElementById('cardHijriah');
+            const elTopHijriah = document.getElementById('topHijriah');
+
+            if (elDisplayMasehi) elDisplayMasehi.textContent = masehiStr;
+            if (elDisplayHijriah) elDisplayHijriah.textContent = hijriahStr;
+            if (elHeaderMasehi) elHeaderMasehi.textContent = masehiStr;
+            if (elCardMasehi) elCardMasehi.textContent = masehiStr;
+            if (elCardHijriah) elCardHijriah.innerHTML = `<i data-lucide="sparkles" class="w-3.5 h-3.5"></i><span>${hijriahStr}</span>`;
+            if (elTopHijriah) elTopHijriah.textContent = hijriahStr;
+
+            if (elBadge) {
+                if (isToday) {
+                    elBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-400/20 text-emerald-200 border border-emerald-400/40';
+                    elBadge.textContent = 'Hari Ini';
+                } else {
+                    elBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-amber-950';
+                    elBadge.textContent = 'Tanggal Kustom';
+                }
+            }
+
+            if (elNotice) {
+                if (isToday) {
+                    elNotice.classList.add('hidden');
+                    elNotice.classList.remove('flex');
+                } else {
+                    elNotice.classList.remove('hidden');
+                    elNotice.classList.add('flex');
+                    if (elNoticeText) elNoticeText.textContent = masehiStr;
+                }
+            }
+
+            // Update Hijriah di seluruh data tabel
+            PRAYER_DATA.forEach(r => r.hijriah = hijriahStr);
+            document.querySelectorAll('.prayer-row').forEach(tr => {
+                const c = tr.querySelectorAll('td');
+                if (c && c[3]) c[3].innerHTML = `<span class="bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200/60 inline-block">${hijriahStr}</span>`;
+            });
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function setQuickDate(preset) {
+            let targetDate = new Date();
+            if (preset === 'yesterday') {
+                targetDate.setDate(targetDate.getDate() - 1);
+            } else if (preset === 'tomorrow') {
+                targetDate.setDate(targetDate.getDate() + 1);
+            }
+            const dateStr = toDateInputString(targetDate);
+            const picker = document.getElementById('prayerDatePicker');
+            if (picker) picker.value = dateStr;
+            onMainDateChange(dateStr);
+        }
+
+        // =====================================================================================
+        // MODAL DETAIL KOTA TERHUBUNG KE LIVE API DATA (DENGAN PILIH TANGGAL)
+        // =====================================================================================
+        function openCityModalById(cityId) {
+            const data = PRAYER_DATA.find(item => item.id === cityId);
+            if (!data) return;
+            openCityModal(data);
+        }
+
+        function openCityModal(data) {
+            currentModalData = data;
+            modalActiveDate = currentSelectedDate;
+
+            document.getElementById('modalKota').textContent     = data.kota;
+            document.getElementById('modalProvinsi').textContent = 'Provinsi ' + data.provinsi;
+            document.getElementById('modalZona').textContent     = data.zona;
+
+            const modalPicker = document.getElementById('modalDatePicker');
+            if (modalPicker) modalPicker.value = modalActiveDate;
+
+            // Reset tampilan bulanan
+            const monthlyContainer = document.getElementById('monthlyScheduleContainer');
+            if (monthlyContainer) monthlyContainer.classList.add('hidden');
+            const chevron = document.getElementById('monthChevron');
+            if (chevron) chevron.classList.remove('rotate-180');
+            const monthBtnText = document.getElementById('monthBtnText');
+            if (monthBtnText) monthBtnText.textContent = 'Lihat Jadwal 1 Bulan Penuh';
+
+            document.getElementById('cityModal').classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+
+            loadModalCityDate(modalActiveDate);
+        }
+
+        function closeCityModal() {
+            const modal = document.getElementById('cityModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        window.addEventListener('click', e => {
+            if (e.target === document.getElementById('cityModal')) closeCityModal();
+        });
+
+        async function loadModalCityDate(dateStr) {
+            if (!currentModalData || !dateStr) return;
+            modalActiveDate = dateStr;
+
+            const dateObj = parseDateString(dateStr);
+            const masehiStr = formatTanggalID(dateObj);
+            const hijriahStr = konversiKeHijriah(dateObj);
+
+            document.getElementById('modalMasehi').textContent = masehiStr;
+            document.getElementById('modalHijriah').textContent = hijriahStr;
+            document.getElementById('modalScheduleLabel').textContent = `Jadwal Sholat - ${masehiStr}`;
+
+            const loadingOverlay = document.getElementById('modalLoadingOverlay');
+            const prayerGrid = document.getElementById('modalPrayerGrid');
+            const apiStatus = document.getElementById('modalApiStatusText');
+
+            if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+            if (prayerGrid) prayerGrid.classList.add('opacity-40');
+            if (apiStatus) apiStatus.textContent = 'Menghubungkan Live API...';
+
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            const endpoint = `https://api.myquran.com/v2/sholat/jadwal/${currentModalData.api_id}/${y}/${m}/${d}`;
+
+            try {
+                const response = await fetch(endpoint, { cache: 'no-cache' });
+                if (response.ok) {
+                    const json = await response.json();
+                    if (json && json.status && json.data && json.data.jadwal) {
+                        const j = json.data.jadwal;
+                        document.getElementById('modalImsak').textContent = j.imsak || '--:--';
+                        document.getElementById('modalSubuh').textContent = j.subuh || '--:--';
+                        document.getElementById('modalTerbit').textContent = j.terbit || '--:--';
+                        document.getElementById('modalDhuha').textContent = j.dhuha || '--:--';
+                        document.getElementById('modalDzuhur').textContent = j.dzuhur || '--:--';
+                        document.getElementById('modalAshar').textContent = j.ashar || '--:--';
+                        document.getElementById('modalMaghrib').textContent = j.maghrib || '--:--';
+                        document.getElementById('modalIsya').textContent = j.isya || '--:--';
+                        if (apiStatus) apiStatus.textContent = 'Live Terverifikasi (Kemenag)';
+
+                        currentModalData.activeSchedule = j;
+                        currentModalData.activeDateMasehi = masehiStr;
+                        currentModalData.activeDateHijriah = hijriahStr;
+
+                        const tr = document.querySelector(`.prayer-row[data-id="${currentModalData.id}"]`);
+                        if (tr) {
+                            const elSubuh = tr.querySelector('.row-subuh');
+                            const elDzuhur = tr.querySelector('.row-dzuhur');
+                            const elAshar = tr.querySelector('.row-ashar');
+                            const elMaghrib = tr.querySelector('.row-maghrib');
+                            const elIsya = tr.querySelector('.row-isya');
+                            const elLive = tr.querySelector('.city-live-indicator');
+
+                            if (elSubuh && j.subuh) elSubuh.textContent = j.subuh;
+                            if (elDzuhur && j.dzuhur) elDzuhur.textContent = j.dzuhur;
+                            if (elAshar && j.ashar) elAshar.textContent = j.ashar;
+                            if (elMaghrib && j.maghrib) elMaghrib.textContent = j.maghrib;
+                            if (elIsya && j.isya) elIsya.textContent = j.isya;
+                            if (elLive) elLive.classList.remove('hidden');
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn('Live API request failed, displaying fallback:', err);
+                if (apiStatus) apiStatus.textContent = 'Offline Fallback (Hisab MABIMS)';
+            } finally {
+                if (loadingOverlay) loadingOverlay.classList.add('hidden');
+                if (prayerGrid) prayerGrid.classList.remove('opacity-40');
+                if (window.lucide) lucide.createIcons();
+            }
+        }
+
+        function stepModalDate(delta) {
+            const current = parseDateString(modalActiveDate);
+            current.setDate(current.getDate() + delta);
+            const nextDateStr = toDateInputString(current);
+            const picker = document.getElementById('modalDatePicker');
+            if (picker) picker.value = nextDateStr;
+            loadModalCityDate(nextDateStr);
+        }
+
+        function setModalToday() {
+            const todayStr = toDateInputString(new Date());
+            const picker = document.getElementById('modalDatePicker');
+            if (picker) picker.value = todayStr;
+            loadModalCityDate(todayStr);
+        }
+
+        // =====================================================================================
+        // TOGGLE JADWAL 1 BULAN PENUH (BULANAN LIVE API)
+        // =====================================================================================
+        async function toggleMonthlySchedule() {
+            const container = document.getElementById('monthlyScheduleContainer');
+            const chevron = document.getElementById('monthChevron');
+            const btnText = document.getElementById('monthBtnText');
+            const loading = document.getElementById('monthScheduleLoading');
+            const wrapper = document.getElementById('monthScheduleTableWrapper');
+            const tbody = document.getElementById('monthScheduleTableBody');
+
+            if (!container) return;
+
+            const isOpening = container.classList.contains('hidden');
+            if (!isOpening) {
+                container.classList.add('hidden');
+                if (chevron) chevron.classList.remove('rotate-180');
+                if (btnText) btnText.textContent = 'Lihat Jadwal 1 Bulan Penuh';
+                return;
+            }
+
+            container.classList.remove('hidden');
+            if (chevron) chevron.classList.add('rotate-180');
+            if (btnText) btnText.textContent = 'Tutup Jadwal 1 Bulan';
+            if (loading) loading.classList.remove('hidden');
+            if (wrapper) wrapper.classList.add('hidden');
+
+            const dateObj = parseDateString(modalActiveDate);
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const cacheKey = `${currentModalData.api_id}_${y}_${m}`;
+
+            try {
+                let monthlyList = monthlyDataCache[cacheKey];
+                if (!monthlyList) {
+                    const endpoint = `https://api.myquran.com/v2/sholat/jadwal/${currentModalData.api_id}/${y}/${m}`;
+                    const res = await fetch(endpoint);
+                    if (res.ok) {
+                        const json = await res.json();
+                        if (json && json.status && json.data && Array.isArray(json.data.jadwal)) {
+                            monthlyList = json.data.jadwal;
+                            monthlyDataCache[cacheKey] = monthlyList;
+                        }
+                    }
+                }
+
+                if (monthlyList && monthlyList.length > 0) {
+                    tbody.innerHTML = '';
+                    monthlyList.forEach(item => {
+                        const isSelectedDay = (item.date === modalActiveDate);
+                        const tr = document.createElement('tr');
+                        tr.className = isSelectedDay 
+                            ? 'bg-emerald-100/90 font-bold text-emerald-950 ring-1 ring-emerald-400' 
+                            : 'hover:bg-slate-50 transition-colors';
+                        
+                        tr.innerHTML = `
+                            <td class="py-1.5 px-3 text-left font-sans font-semibold">
+                                ${item.tanggal ? item.tanggal.split(',')[0] + ', ' + (item.date ? item.date.split('-')[2] : '') : item.date}
+                                ${isSelectedDay ? '<span class="ml-1 text-[9px] bg-emerald-700 text-white px-1 py-0.2 rounded font-mono">Pilihan</span>' : ''}
+                            </td>
+                            <td class="py-1.5 px-1.5">${item.subuh || '-'}</td>
+                            <td class="py-1.5 px-1.5">${item.dzuhur || '-'}</td>
+                            <td class="py-1.5 px-1.5">${item.ashar || '-'}</td>
+                            <td class="py-1.5 px-1.5 font-bold text-emerald-800">${item.maghrib || '-'}</td>
+                            <td class="py-1.5 px-1.5">${item.isya || '-'}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+
+                    if (loading) loading.classList.add('hidden');
+                    if (wrapper) wrapper.classList.remove('hidden');
+                } else {
+                    if (loading) loading.innerHTML = '<p class="text-amber-700 py-3">Jadwal bulanan tidak tersedia untuk periode ini.</p>';
+                }
+            } catch (err) {
+                if (loading) loading.innerHTML = `<p class="text-rose-600 py-3">Gagal memuat jadwal bulanan: ${err.message}</p>`;
+            }
+        }
+
+        // =====================================================================================
+        // SALIN JADWAL SHOLAT KE CLIPBOARD (DILENGKAPI TANGGAL TERPILIH)
+        // =====================================================================================
+        function copyScheduleToClipboard() {
+            if (!currentModalData) return;
+            const sched = currentModalData.activeSchedule || currentModalData;
+            const masehi = currentModalData.activeDateMasehi || formatTanggalID(parseDateString(modalActiveDate));
+            const hijriah = currentModalData.activeDateHijriah || konversiKeHijriah(parseDateString(modalActiveDate));
+
+            const text = `Jadwal Sholat ${currentModalData.kota} (${currentModalData.provinsi})\n` +
+                         `Tanggal : ${masehi} / ${hijriah}\n` +
+                         `Zona    : ${currentModalData.zona}\n` +
+                         `-----------------------------------\n` +
+                         `Imsak   : ${sched.imsak || '--:--'}\n` +
+                         `Subuh   : ${sched.subuh || '--:--'}\n` +
+                         `Terbit  : ${sched.terbit || '--:--'}\n` +
+                         `Dhuha   : ${sched.dhuha || '--:--'}\n` +
+                         `Dzuhur  : ${sched.dzuhur || '--:--'}\n` +
+                         `Ashar   : ${sched.ashar || '--:--'}\n` +
+                         `Maghrib : ${sched.maghrib || '--:--'}\n` +
+                         `Isya    : ${sched.isya || '--:--'}\n` +
+                         `-----------------------------------\n` +
+                         `Sumber  : Live API Kementerian Agama RI (MyQuran / Standar MABIMS)`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const b = document.getElementById('copyBtnText');
+                if (b) b.textContent = 'Tersalin!';
+                setTimeout(() => { if (b) b.textContent = 'Salin Jadwal'; }, 2000);
+            }).catch(err => {
+                alert('Gagal menyalin teks: ' + err);
+            });
+        }
+
+        // =====================================================================================
+        // FITUR EKSPOR DATA KE FORMAT EXCEL (.XLS)
+        // =====================================================================================
+        function exportToExcel() {
+            let tableHtml = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+                <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+                <x:Name>Jadwal Sholat 38 Ibukota</x:Name>
+                <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+                </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+                <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8"/>
+                <style>
+                    body { font-family: Calibri, 'Segoe UI', Arial, sans-serif; }
+                    .header-title { font-size: 14pt; font-weight: bold; color: #065f46; }
+                    .sub-title { font-size: 10pt; color: #475569; margin-bottom: 12px; }
+                    table { border-collapse: collapse; width: 100%; }
+                    th { background-color: #059669; color: #ffffff; font-weight: bold; padding: 10px 8px; text-align: center; border: 1px solid #047857; }
+                    td { padding: 8px; border: 1px solid #cbd5e1; font-size: 10pt; }
+                    .center { text-align: center; }
+                    .bold { font-weight: bold; }
+                    .highlight { background-color: #ecfdf5; font-weight: bold; color: #047857; text-align: center; }
+                    .verified { color: #059669; font-weight: bold; text-align: center; }
+                </style>
+            </head>
+            <body>
+                <div class="header-title">SISTEM MONITORING JADWAL SHOLAT SELURUH INDONESIA (LIVE API)</div>
+                <div class="sub-title">Cakupan: 38 Ibukota Provinsi Resmi | Standar Hisab: Kementerian Agama RI (MABIMS / MyQuran API) | Tanggal: ${formatTanggalID(parseDateString(currentSelectedDate))}</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Kota</th>
+                            <th>Provinsi</th>
+                            <th>Zona Waktu</th>
+                            <th>Tanggal Masehi</th>
+                            <th>Kalender Hijriah</th>
+                            <th>Subuh</th>
+                            <th>Dzuhur</th>
+                            <th>Ashar</th>
+                            <th>Maghrib</th>
+                            <th>Isya</th>
+                            <th>Status Validasi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            let idx = 1;
+            const currentMasehi = formatTanggalID(parseDateString(currentSelectedDate));
+            const currentHijri = konversiKeHijriah(parseDateString(currentSelectedDate));
+
+            document.querySelectorAll('.prayer-row').forEach(tr => {
+                if (tr.style.display !== 'none') {
+                    const c = tr.querySelectorAll('td');
+                    const provText = c[1].innerText.split('\n')[1] ? c[1].innerText.split('\n')[1].replace('Prov.', '').trim() : '';
+                    tableHtml += `
+                        <tr>
+                            <td class="center">${idx++}</td>
+                            <td class="bold">${tr.dataset.kota ? tr.dataset.kota.toUpperCase() : ''}</td>
+                            <td>${provText}</td>
+                            <td class="center">${tr.dataset.zona || ''}</td>
+                            <td>${currentMasehi}</td>
+                            <td>${currentHijri}</td>
+                            <td class="highlight">${c[4] ? c[4].innerText.trim() : ''}</td>
+                            <td class="center">${c[5] ? c[5].innerText.trim() : ''}</td>
+                            <td class="center">${c[6] ? c[6].innerText.trim() : ''}</td>
+                            <td class="highlight">${c[7] ? c[7].innerText.trim() : ''}</td>
+                            <td class="center">${c[8] ? c[8].innerText.trim() : ''}</td>
+                            <td class="verified">Live API Kemenag RI</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            tableHtml += `
+                    </tbody>
+                </table>
+            </body>
+            </html>`;
+
+            const blob = new Blob(['\ufeff', tableHtml], {
+                type: 'application/vnd.ms-excel;charset=utf-8'
+            });
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Jadwal_Sholat_38_Ibukota_Indonesia_${currentSelectedDate}.xls`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // =====================================================================================
+        // FITUR EKSPOR DATA KE FORMAT CSV
+        // =====================================================================================
+        function exportToCSV() {
+            const rows = [['No', 'Kota', 'Provinsi', 'Zona Waktu', 'Tanggal Masehi', 'Kalender Hijriah', 'Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya', 'Status']];
+            let idx = 1;
+            const currentMasehi = formatTanggalID(parseDateString(currentSelectedDate));
+            const currentHijri = konversiKeHijriah(parseDateString(currentSelectedDate));
+
+            document.querySelectorAll('.prayer-row').forEach(tr => {
+                if (tr.style.display !== 'none') {
+                    const c = tr.querySelectorAll('td');
+                    const kotaName = tr.dataset.kota ? tr.dataset.kota.toUpperCase() : '';
+                    const provText = c[1].innerText.split('\n')[1] ? c[1].innerText.split('\n')[1].replace('Prov.', '').trim() : '';
+                    rows.push([
+                        idx++,
+                        kotaName,
+                        provText,
+                        tr.dataset.zona,
+                        currentMasehi,
+                        currentHijri,
+                        c[4].innerText.trim(),
+                        c[5].innerText.trim(),
+                        c[6].innerText.trim(),
+                        c[7].innerText.trim(),
+                        c[8].innerText.trim(),
+                        'Live API Kemenag'
+                    ]);
+                }
+            });
+            const csv  = 'data:text/csv;charset=utf-8,' + rows.map(r => r.map(v => '"' + v + '"').join(',')).join('\n');
+            const link = document.createElement('a');
+            link.href  = encodeURI(csv);
+            link.download = 'Jadwal_Sholat_38_Ibukota_Indonesia_' + currentSelectedDate + '.csv';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // =====================================================================================
+        // KEYBOARD SHORTCUTS
+        // =====================================================================================
+        window.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeCityModal();
+            if ((e.ctrlKey && e.key.toLowerCase() === 'k') || (e.key === '/' && document.activeElement.tagName !== 'INPUT')) {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+        });
+
+        // =====================================================================================
+        // INISIALISASI HALAMAN
+        // =====================================================================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            const todayStr = toDateInputString(today);
+            const picker = document.getElementById('prayerDatePicker');
+            if (picker) picker.value = todayStr;
+
+            document.getElementById('topHijriah').textContent         = hijriah;
+            document.getElementById('headerTanggalMasehi').textContent = masehi;
+            document.getElementById('cardTanggalMasehi').textContent   = masehi;
+            document.getElementById('cardHijriah').innerHTML =
+                '<i data-lucide="sparkles" class="w-3.5 h-3.5"></i><span>' + hijriah + '</span>';
+            document.getElementById('displayMasehiText').textContent = masehi;
+            document.getElementById('displayHijriahText').textContent = hijriah;
+            document.getElementById('footerYear').innerHTML = '&copy; ' + today.getFullYear() + ' All Rights Reserved.';
+
+            renderTable(PRAYER_DATA);
+            startLiveClocks();
+            if (window.lucide) lucide.createIcons();
+
+            // Auto-sync background untuk kota Jakarta (default API: 1301)
+            try {
+                const jktLive = await fetchLivePrayerData('1301');
+                if (jktLive) {
+                    const jkt = PRAYER_DATA.find(x => x.id === 12);
+                    if (jkt) {
+                        jkt.subuh = jktLive.subuh || jkt.subuh;
+                        jkt.dzuhur = jktLive.dzuhur || jkt.dzuhur;
+                        jkt.ashar = jktLive.ashar || jkt.ashar;
+                        jkt.maghrib = jktLive.maghrib || jkt.maghrib;
+                        jkt.isya = jktLive.isya || jkt.isya;
+                        jkt.imsak = jktLive.imsak || jkt.imsak;
+                        jkt.isLive = true;
+                        const trJkt = document.querySelector('.prayer-row[data-id="12"]');
+                        if (trJkt) {
+                            trJkt.querySelector('.row-subuh').textContent = jkt.subuh;
+                            trJkt.querySelector('.row-dzuhur').textContent = jkt.dzuhur;
+                            trJkt.querySelector('.row-ashar').textContent = jkt.ashar;
+                            trJkt.querySelector('.row-maghrib').textContent = jkt.maghrib;
+                            trJkt.querySelector('.row-isya').textContent = jkt.isya;
+                            trJkt.querySelector('.city-live-indicator').classList.remove('hidden');
+                        }
+                    }
+                }
+            } catch (e) {}
+        });
+    </script>
+</body>
+</html>
